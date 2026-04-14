@@ -394,6 +394,12 @@ class ACDriver:
 
     def reconnectDriver(self, carState):
         self.ptracker_conn = None
+        # Keep player identity fields in sync with the latest AC connection event.
+        # This is important when guids_based_on_driver_names is enabled: the
+        # mapped guid is recalculated from the current driverName on reconnect.
+        self.name = carState.driverName
+        self.team = carState.driverTeam
+        self.car = carState.carModel
         self.carId = carState.carId
 
     def updatePtrackerConn(self, connection, ac_version, pt_version, track_checksum, car_checksum):
