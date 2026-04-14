@@ -253,7 +253,8 @@ class GenericBackend(DbSchemata):
                 FROM LapTimes
                 WHERE (Track=:trackname AND Car=:carname AND SteamGuid=:playerGuid AND Valid>=1) ORDER BY LapTime ASC LIMIT 1;
             """, locals())
-            r = cur.fetchone()
+            rr = cur.fetchall()
+            r = rr[0] if len(rr) > 0 else None
             if r is None:
                 pb = None
             else:
@@ -264,7 +265,8 @@ class GenericBackend(DbSchemata):
                 FROM LapTimes
                 WHERE (Track=:trackname AND Car=:carname AND Valid>=1) ORDER BY LapTime ASC LIMIT 1;
             """, locals())
-            r = cur.fetchone()
+            rr = cur.fetchall()
+            r = rr[0] if len(rr) > 0 else None
             if r is None:
                 sb = None
             else:
@@ -291,7 +293,11 @@ class GenericBackend(DbSchemata):
                     WHERE (Track=:trackname AND Car=:carname AND Valid=:lapValid %s)
                     ORDER BY SectorTime%d ASC LIMIT 1;
                 """ % (i,stmt,i), locals())
-                row = cur.fetchone()
+                # APSW requires consuming the full result set before reusing the
+                # cursor for another statement. LIMIT 1 still yields a result
+                # set object, so use fetchall() and take the first row.
+                rows = cur.fetchall()
+                row = rows[0] if len(rows) > 0 else None
 
                 if row is None:
                     res.append(None)
