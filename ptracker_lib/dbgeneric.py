@@ -203,8 +203,8 @@ class GenericBackend(DbSchemata):
             """ % stmt
 
             cur.execute(stmt, locals())
-
-            row = cur.fetchone()
+            rows = cur.fetchall()
+            row = rows[0] if len(rows) > 0 else None
             if row is None:
                 return None
             sectorTimes = list(map(int, row[1:11]))
@@ -212,7 +212,9 @@ class GenericBackend(DbSchemata):
                 if s >= self.invalidSplit:
                     sectorTimes[i] = None
             lapId = row[11]
-            hi = cur.execute("SELECT HistoryInfo FROM LapBinBlob WHERE LapId=:lapId", locals()).fetchone()
+            cur.execute("SELECT HistoryInfo FROM LapBinBlob WHERE LapId=:lapId", locals())
+            hi_rows = cur.fetchall()
+            hi = hi_rows[0] if len(hi_rows) > 0 else None
             if not hi is None: hi = hi[0]
             try:
                 sampleTimes, worldPositions, velocities, normSplinePositions = decompress(hi)
