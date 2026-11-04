@@ -6,13 +6,18 @@ project's README and GPL license remain in `README.txt` and `LICENSE.txt`.
 The custom changes preserve driver identity on reconnect and fix incomplete
 APSW query results when querying personal/server best laps, sectors, and history.
 
+The Windows executable belongs at `stracker/stracker.exe`; the existing Linux
+build remains at `stracker/stracker_linux_x86.tgz`. Both use the custom 3.4.1
+source. Windows build provenance is recorded in `stracker/WINDOWS_BUILD.md`.
+
 ## Windows test builds
 
-The **Windows build and validation** Actions workflow builds the server-side
-`stracker.exe` on Windows x64. It uses Python 3.6.8, PyInstaller 4.10, and APSW
+The **Windows build and validation** Actions workflow builds a single-file server-side
+`stracker.exe` on Windows x64. Python and native modules are embedded, matching
+the existing executable's deployment style. It uses Python 3.6.8, PyInstaller 4.10, and APSW
 3.39.4.0, with dependencies pinned in `requirements-windows-build.txt`.
 
-Each successful run provides an **Actions artifact**, containing a ZIP package,
+Each successful run provides an **Actions artifact**, containing `stracker.exe`, a ZIP package,
 SHA256 checksum, and installed package versions. This is a validation build;
 the workflow does **not** create a tag or publish a GitHub Release.
 
@@ -27,8 +32,10 @@ The workflow checks:
 It does not validate an actual Windows 11 AC multiplayer session, public port
 forwarding, or a production database. Those remain deployment acceptance checks.
 
-Copy the **entire** extracted `stracker/` directory to a test server, then use
-copies of your configuration and database. Server Manager expects
+For an existing install, replace **stracker.exe only** and preserve your configuration,
+database, customized `http_templates/`, and `http_static/`. No sibling Python DLLs
+or PYD files are needed. A fresh install can use the complete `stracker/` folder
+inside the ZIP, including its web resources. Server Manager expects
 `server/stracker/stracker.exe`. Linux binaries and Python `.so` files cannot be
 used as Windows dependencies.
 
