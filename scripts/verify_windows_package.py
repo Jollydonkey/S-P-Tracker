@@ -1,6 +1,7 @@
 """Validate the EXTRACTED Windows artifact with disposable files only."""
 import argparse
 import json
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -47,7 +48,7 @@ def main():
         for db in (database, backup):
             if not db.is_file():
                 raise RuntimeError('Database was not created: ' + str(db))
-            with sqlite3.connect(str(db)) as conn:
+            with closing(sqlite3.connect(str(db))) as conn:
                 if conn.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
                     raise RuntimeError('Database integrity check failed')
                 if conn.execute('PRAGMA user_version').fetchone()[0] <= 0:
