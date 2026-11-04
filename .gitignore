@@ -1,0 +1,23 @@
+# OS and Python caches
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local build environments and generated output
+.venv*/
+/build/
+/dist/
+/artifacts/
+/stracker/build/
+/stracker/dist/
+/stracker/*.spec
+/stracker/stracker_linux_x86.tgz
+
+# Machine-specific release configuration and runtime data
+/remote_settings.py
+*.db3
+*.db3-*
+*.log
+/stracker/stracker.ini
