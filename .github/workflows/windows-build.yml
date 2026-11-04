@@ -3,6 +3,9 @@ name: Windows build and validation
 on:
   push:
     branches: [stable-3.4.1]
+    paths-ignore:
+      - stracker/stracker.exe
+      - stracker/WINDOWS_BUILD.md
   workflow_dispatch:
 
 permissions:
