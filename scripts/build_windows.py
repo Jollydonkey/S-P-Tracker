@@ -30,7 +30,7 @@ def main():
         shutil.rmtree(str(build))
     build.mkdir(parents=True)
     args = [sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean',
-            '--onedir', '--console', '--noupx', '--name', 'stracker',
+            '--onefile', '--console', '--noupx', '--name', 'stracker',
             '--distpath', str(build / 'dist'), '--workpath', str(build / 'work'),
             '--specpath', str(build / 'spec'),
             '--paths', str(ROOT), '--paths', str(ROOT / 'stracker' / 'externals'),
@@ -41,15 +41,18 @@ def main():
         args += ['--hidden-import', module]
     args.append(str(ROOT / 'stracker' / 'stracker.py'))
     subprocess.check_call(args, cwd=str(ROOT / 'stracker'))
-    package = build / 'dist' / 'stracker'
+    package = build / 'package' / 'stracker'
+    package.mkdir(parents=True)
+    shutil.copy2(str(build / 'dist' / 'stracker.exe'), str(package / 'stracker.exe'))
     for folder in ['http_templates', 'http_static']:
         shutil.copytree(str(ROOT / 'stracker' / folder), str(package / folder),
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
     shutil.copy2(str(ROOT / 'LICENSE.txt'), str(package / 'LICENSE.txt'))
     (package / 'README_WINDOWS.txt').write_text(
         'Custom sTracker 3.4.1 for Windows x64\n\n'
-        'Copy this entire stracker folder to the AC server directory.\n'
-        'Keep stracker.exe, its DLLs, http_templates and http_static together.\n'
+        'This is a single-file executable with Python and native modules embedded.\n'
+        'For an existing install, replace stracker.exe only; keep its configuration, database and web resources.\n'
+        'For a fresh install, copy this folder including http_templates and http_static.\n'
         'Use a COPY of your configuration and database for initial testing.\n'
         'Server Manager expects server/stracker/stracker.exe and writes stracker.ini.\n'
         'A standalone launch needs --stracker_ini PATH.\n'
@@ -57,15 +60,18 @@ def main():
         'CI does not certify real multiplayer operation on Windows 11.\n', encoding='utf-8')
     commit = os.environ.get('GITHUB_SHA') or subprocess.check_output(
         ['git', 'rev-parse', 'HEAD'], cwd=str(ROOT), universal_newlines=True).strip()
-    metadata = dict(source_commit=commit, python=sys.version, platform=platform.platform(),
+    metadata = dict(source_commit=commit, packaging='onefile', python=sys.version, platform=platform.platform(),
                     build_command=args, exe_sha256=sha256(package / 'stracker.exe'),
                     tests='See Actions validation logs; no production database used')
     (package / 'BUILD_METADATA.json').write_text(json.dumps(metadata, indent=2), encoding='utf-8')
     artifacts = ROOT / 'artifacts'
     artifacts.mkdir(exist_ok=True)
+    shutil.copy2(str(package / 'stracker.exe'), str(artifacts / 'stracker.exe'))
     zip_path = Path(shutil.make_archive(str(artifacts / 'stracker-3.4.1-windows-x64'),
                                        'zip', root_dir=str(package.parent), base_dir='stracker'))
-    (artifacts / 'SHA256SUMS.txt').write_text(sha256(zip_path) + '  ' + zip_path.name + '\n', encoding='utf-8')
+    (artifacts / 'SHA256SUMS.txt').write_text(
+        sha256(zip_path) + '  ' + zip_path.name + '\n' +
+        sha256(artifacts / 'stracker.exe') + '  stracker.exe\n', encoding='utf-8')
     print('Built', zip_path)
 
 
