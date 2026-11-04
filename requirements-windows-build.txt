@@ -1,0 +1,18 @@
+# CPython 3.6.8 x64, matching the existing Python 3.6 Linux codebase.
+altgraph==0.17.5
+apsw==3.39.4.0
+bottle==0.12.7
+CherryPy==8.1.2
+importlib-metadata==4.8.3
+pefile==2022.5.30
+psycopg2-binary==2.9.5
+pyinstaller==4.10
+pyinstaller-hooks-contrib==2022.0
+python-dateutil==2.5.1
+pywin32==301
+pywin32-ctypes==0.2.0
+simplejson==3.8.0
+six==1.17.0
+typing-extensions==4.1.1
+wsgi-request-logger==0.4.1
+zipp==3.6.0
