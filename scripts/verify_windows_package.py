@@ -19,6 +19,11 @@ def main():
             z.extractall(str(root))
         package = root / 'stracker'
         exe = package / 'stracker.exe'
+        metadata = json.loads((package / 'BUILD_METADATA.json').read_text(encoding='utf-8'))
+        if metadata.get('packaging') != 'onefile':
+            raise RuntimeError('Expected a single-file executable')
+        if list(package.glob('*.dll')) or list(package.glob('*.pyd')):
+            raise RuntimeError('Single-file package must not require sibling DLL/PYD files')
         for path in [exe, package / 'http_templates' / 'tmpl_mainpage.py',
                      package / 'http_static' / 'bootstrap' / 'css' / 'custom.css']:
             if not path.is_file():
@@ -53,7 +58,7 @@ def main():
                     raise RuntimeError('Database integrity check failed')
                 if conn.execute('PRAGMA user_version').fetchone()[0] <= 0:
                     raise RuntimeError('Database schema was not initialized')
-        print(json.dumps({'frozen_help': 'passed', 'bundled_resources': 'passed',
+        print(json.dumps({'single_file_layout': 'passed', 'frozen_help': 'passed', 'bundled_resources': 'passed',
                           'synthetic_database_and_backup': 'passed',
                           'real_ac_server_or_player_test': 'not performed'}, indent=2))
 
